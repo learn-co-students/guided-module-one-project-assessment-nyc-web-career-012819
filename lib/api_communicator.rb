@@ -49,16 +49,19 @@ def menu
       end
 
     elsif input == "Update" || input == "3" || input == "update"
-        puts "Please enter the movie name to edit: "
-        movie_name = gets.chomp
+      puts "Please enter the movie name to edit: "
+      movie_name = gets.chomp
+      puts " has been updated"
+      menu
     elsif input == "Delete" || input == "4" || input == "delete"
       puts "Please enter the movie name to delete: "
       movie_name = gets.chomp
+      puts " has been deleted"
+      menu
     #.destory
     else
-
-
-  end
+      puts "Hasta la vista, baby."
+    end
 end
 
 def menu_streaming_services(new_movie)
