@@ -36,18 +36,27 @@ def menu
       movie_name = gets.chomp
       get_movie_streaming_services_from_api(movie_name)
     elsif input == "Add" || input == "2" || input == "add"
-      # binding.pry
       puts "Please enter the movie name to add: "
       movie_name = gets.chomp
-      new_movie= Movie.find_or_create_by(name: movie_name)
-      menu_streaming_services(new_movie)
+      new_movie = Movie.find_by(name: movie_name)
+      if new_movie
+        newer_movie = Movie.create(name: movie_name)
+        puts "#{newer_movie.name.capitalize} already exists"
+        menu
+      else
+        puts "#{movie_name.capitalize} doesn't exist, please add the associated streaming service."
+        menu_streaming_services(new_movie)
+      end
+
     elsif input == "Update" || input == "3" || input == "update"
-      puts "Please enter the movie name to edit: "
-      movie_name = gets.chomp
+        puts "Please enter the movie name to edit: "
+        movie_name = gets.chomp
     elsif input == "Delete" || input == "4" || input == "delete"
       puts "Please enter the movie name to delete: "
       movie_name = gets.chomp
+    #.destory
     else
+
 
   end
 end
