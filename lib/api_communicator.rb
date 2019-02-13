@@ -4,11 +4,25 @@ require 'pry'
 
 def get_movie_streaming_services_from_api(movie_name)
   #make the web request
-  response_string = Unirest.get('https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com/lookup'),
-  headers: {
-  "X-RapidAPI-Key" => {ENV['API_KEY']}
+  response = Unirest.get "https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com/lookup?term=#{movie_name}",
+  headers:{
+    "X-RapidAPI-Key" => ENV['API_KEY']
   }
-  response_hash = JSON.parse(response_string)
+  # response_hash = JSON.parse(response.body)
+  num_locations = response.body["results"][0]["locations"].length
+  i = 0
+  while i < num_locations
+    puts response.body["results"][0]["locations"][i]["name"]
+    puts response.body["results"][0]["locations"][i]["url"]
+    i += 1
+  end
+  # puts response.body["results"][0]["locations"][0]["name"]
+  #response.body["results"][0]["locations"][0]["url"]
+  # binding.pry
+  # response.body.select do |key, value|
+  #   puts "#{key}: #{value}"
+  # end
+end
 
 # character_data = response_hash["results"]
 # character_data.find do |info|

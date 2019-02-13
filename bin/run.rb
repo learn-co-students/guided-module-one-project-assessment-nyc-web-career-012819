@@ -1,5 +1,5 @@
 require_relative '../config/environment'
-require_relative '../lib/api_communicator.rb'
+
 
 greet
-enter_movie
+get_movie_streaming_services_from_api(enter_movie)
