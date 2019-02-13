@@ -33,10 +33,11 @@ puts "
 "
 
 def greet
-  puts "Welcome to the Movie App you always wanted!!"
+  puts "You had me at hello! Welcome to Move On, the movie app that tells you on what streaming services your movies are located."
 end
 
+
 def enter_movie
-  puts "Please enter a movie title to find out what streaming services it is on:"
+  puts "\nPlease enter a movie title to find out what streaming services it is on:"
   gets.chomp
 end

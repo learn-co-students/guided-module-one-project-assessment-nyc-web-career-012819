@@ -8,3 +8,4 @@ gem "require_all"
 gem "faker"
 gem "dotenv"
 gem "unirest"
+gem 'tty-prompt'
