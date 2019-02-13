@@ -34,14 +34,20 @@ def menu
     if input == "Check" || input == "1" || input == "check"
       puts "Please enter the movie name: "
       movie_name = gets.chomp
-      get_movie_streaming_services_from_api(movie_name)
+      if Movie.find_by(name: movie_name)
+        get_movie_streaming_services_from_api(movie_name)
+      else
+        puts "#{movie_name.capitalize} does not exist, please proceed to another option."
+        menu
+      end
+
     elsif input == "Add" || input == "2" || input == "add"
       puts "Please enter the movie name to add: "
       movie_name = gets.chomp
       new_movie = Movie.find_by(name: movie_name)
       if new_movie
         newer_movie = Movie.create(name: movie_name)
-        puts "#{newer_movie.name.capitalize} already exists"
+        puts "#{newer_movie.name.capitalize} already exists."
         menu
       else
         puts "#{movie_name.capitalize} doesn't exist, please add the associated streaming service."
@@ -51,12 +57,17 @@ def menu
     elsif input == "Update" || input == "3" || input == "update"
       puts "Please enter the movie name to edit: "
       movie_name = gets.chomp
-      puts " has been updated"
+      new_movie = Movie.find_by(name: movie_name)
+      new_movie.update
+      puts "#{new_movie} has been updated"
       menu
+      #.update
     elsif input == "Delete" || input == "4" || input == "delete"
       puts "Please enter the movie name to delete: "
       movie_name = gets.chomp
-      puts " has been deleted"
+      new_movie = Movie.find_by(name: movie_name)
+      new_movie.destroy
+      puts "#{new_movie} has been deleted"
       menu
     #.destory
     else
@@ -65,7 +76,7 @@ def menu
 end
 
 def menu_streaming_services(new_movie)
-  choices = ["Netflix", "Hulu", "Amazon", "ITunes", "HBO"]
+  choices = ["Netflix", "Hulu", "Amazon", "ITunes", "HBO", "Exit"]
 
   num = 1
   choices.each do |choice|
@@ -80,5 +91,7 @@ def menu_streaming_services(new_movie)
     elsif input == "Amazon" || input == "3" || input == "amazon"
     elsif input == "ITunes" || input == "4" || input == "itunes"
     elsif input == "HBO" || input == "5" || input == "hbo"
+    else
+      puts "I'll be back."
   end
 end
