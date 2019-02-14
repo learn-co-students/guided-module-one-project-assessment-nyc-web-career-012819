@@ -11,17 +11,29 @@ def get_movie_streaming_services_from_api(movie_name)
 
 
   if response.body["results"].length == 0
-    puts "#{movie_name.capitalize} does not exist, please proceed to another option."
-  else
-    num_locations = response.body["results"][0]["locations"].length
-    i = 0
-    while i < num_locations
-      puts "\nName: #{response.body["results"][0]["name"]}"
-      puts "Streaming Service: #{response.body["results"][0]["locations"][i]["name"]}"
-      puts "URL: #{response.body["results"][0]["locations"][i]["url"]}"
-      i += 1
+    # binding.pry
+    if Movie.find_by(name: movie_name)
+      # movie_name_id = Movie.find_by(name: movie_name).id
+      # movie_streaming_service_id = MovieStreamingService.find_by(movie_id: movie_name_id).streaming_service_id
+      # StreamingService.find_by(id: movie_streaming_service_id)
+      # binding.pry
+      puts "Name: #{movie_name}"
+      # puts "Streaming Service: "
+    else
+      puts "#{movie_name.capitalize} does not exist, please proceed to another option."
+      menu
     end
-    menu
+  else
+    movie = Movie.find_or_create_by(name: movie_name.titleize)
+    response.body["results"][0]["locations"].each do |location|
+      associated_streaming_service = StreamingService.find_or_create_by(name: location["name"], url: location["url"])
+      MovieStreamingService.find_or_create_by(movie_id: movie.id, streaming_service_id: associated_streaming_service.id)
+    end
+
+      # puts "\nName: #{response.body["results"][0]["name"]}"
+      # puts "Streaming Service: #{response.body["results"][0]["locations"][i]["name"]}"
+      # puts "URL: #{response.body["results"][0]["locations"][i]["url"]}"
+    # menu
   end
 end
 
@@ -34,37 +46,24 @@ def menu
     puts "#{num}. #{choice}"
     num += 1
   end
-  input = gets.chomp
+    input = gets.chomp
 
     if input == "Check" || input == "1" || input == "check"
       puts "Please enter the movie name: "
       movie_name = gets.chomp
-      # create empty movie info array
-      # check if the user input (name of movie/show) is in api.
-      # IF IT IS - add results to movie info array
-      # check if the user input is in own db.
-      # IF IT IS - add results to movie info array
-      # remove duplicate data from movie info array *** option ***
-      # iterate over unique movie info array and puts out each result
-      
 
-      if Movie.find_by(name: movie_name)
-        # binding.pry
-        movie_from_db = Movie.find_by(name: movie_name)
-        # binding.pry
-        puts "Name: #{movie_from_db.name}"
+      get_movie_streaming_services_from_api(movie_name)
 
-        movie_streaming_service_from_db = MovieStreamingService.find_by(movie_id: movie_from_db.id)
-        streaming_service = StreamingService.find_by(id: movie_streaming_service_from_db.streaming_service_id)
-        # binding.pry
-        puts "Streaming Service: #{streaming_service.name}"
-        # puts "Name: #{movie_from_db.name}"
+      movie_from_db = Movie.find_by(name: movie_name)
+      all_streaming_services = movie_from_db.streaming_services
 
-      else
-        # binding.pry
-        get_movie_streaming_services_from_api(movie_name)
-        menu
+      puts "#{movie_name} is in ."
+      # binding.pry
+      all_streaming_services.each do |streaming_service|
+        puts "\nName: #{streaming_service.name}"
+        puts "Url: #{streaming_service.url}"
       end
+      menu
 
     elsif input == "Add" || input == "2" || input == "add"
       puts "Please enter the movie name to add: "
@@ -90,11 +89,11 @@ def menu
       # binding.pry
       new_s_id = StreamingService.find_by(name: new_streaming_service_name).id
       current_streaming_service_id = MovieStreamingService.where(movie_id: new_movie_id)
-      new_streaming_service_id = current_streaming_service_id.update_attribute(streaming_service_id: new_s_id)
+      new_streaming_service_id = current_streaming_service_id.update(streaming_service_id: new_s_id)
       # new_streaming_service_id.save
       # updated_movie = new_movie.update(name: )
       # updated_movie.save
-      puts "#{updated_movie.name.capitalize} has been updated with the correct streaming service."
+      # puts "#{updated_movie.name.capitalize} has been updated with the correct streaming service."
       menu
       #.update
     elsif input == "Delete" || input == "4" || input == "delete"
@@ -126,15 +125,15 @@ def menu_streaming_services(new_movie)
 
   input = gets.chomp
     if input == "Netflix" || input == "1" || input == "netflix"
-      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 1)
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "Netflix").id)
     elsif input == "Hulu" || input == "2" || input == "hulu"
-      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 2)
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "Hulu").id)
     elsif input == "Amazon Prime" || input == "3" || input == "amazon prime"
-      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 3)
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "Amazon Prime").id)
     elsif input == "ITunes" || input == "4" || input == "itunes"
-      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 4)
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "ITunes").id)
     elsif input == "HBO" || input == "5" || input == "hbo"
-      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 5)
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "HBO").id)
     else
       puts "I'll be back."
   end
