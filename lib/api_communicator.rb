@@ -9,15 +9,20 @@ def get_movie_streaming_services_from_api(movie_name)
     "X-RapidAPI-Key" => ENV['API_KEY']
   }
 
-  num_locations = response.body["results"][0]["locations"].length
-  i = 0
-  while i < num_locations
-    puts "\nName: #{response.body["results"][0]["name"]}"
-    puts "Streaming Service: #{response.body["results"][0]["locations"][i]["name"]}"
-    puts "URL: #{response.body["results"][0]["locations"][i]["url"]}"
-    i += 1
+
+  if response.body["results"].length == 0
+    puts "#{movie_name.capitalize} does not exist, please proceed to another option."
+  else
+    num_locations = response.body["results"][0]["locations"].length
+    i = 0
+    while i < num_locations
+      puts "\nName: #{response.body["results"][0]["name"]}"
+      puts "Streaming Service: #{response.body["results"][0]["locations"][i]["name"]}"
+      puts "URL: #{response.body["results"][0]["locations"][i]["url"]}"
+      i += 1
+    end
+    menu
   end
-  menu
 end
 
 def menu
@@ -35,9 +40,17 @@ def menu
       puts "Please enter the movie name: "
       movie_name = gets.chomp
       if Movie.find_by(name: movie_name)
-        get_movie_streaming_services_from_api(movie_name)
+        movie_from_db = Movie.find_by(name: movie_name)
+        puts "Name: #{movie_from_db.name}"
+
+        movie_streaming_service_from_db = MovieStreamingService.find_by(movie_id: movie_from_db.id)
+        streaming_service = StreamingService.find_by(id: movie_streaming_service_from_db.streaming_service_id)
+        # binding.pry
+        puts "Streaming Service: #{streaming_service.name}"
+        # puts "Name: #{movie_from_db.name}"
+
       else
-        puts "#{movie_name.capitalize} does not exist, please proceed to another option."
+        get_movie_streaming_services_from_api(movie_name)
         menu
       end
 
@@ -46,37 +59,52 @@ def menu
       movie_name = gets.chomp
       new_movie = Movie.find_by(name: movie_name)
       if new_movie
-        newer_movie = Movie.create(name: movie_name)
-        puts "#{newer_movie.name.capitalize} already exists."
+        puts "#{new_movie.name.capitalize} already exists."
         menu
       else
+        newer_movie = Movie.create(name: movie_name)
         puts "#{movie_name.capitalize} doesn't exist, please add the associated streaming service."
-        menu_streaming_services(new_movie)
+        menu_streaming_services(movie_name)
+        puts "#{movie_name.capitalize} was added to the corresponding streaming service."
+        menu
       end
 
     elsif input == "Update" || input == "3" || input == "update"
       puts "Please enter the movie name to edit: "
       movie_name = gets.chomp
-      new_movie = Movie.find_by(name: movie_name)
-      new_movie.update
-      puts "#{new_movie} has been updated"
+      new_movie_id = Movie.find_by(name: movie_name).id
+      puts "Please enter the name of the streaming service you wish to change to: "
+      new_streaming_service_name = gets.chomp
+      # binding.pry
+      new_s_id = StreamingService.find_by(name: new_streaming_service_name).id
+      current_streaming_service_id = MovieStreamingService.where(movie_id: new_movie_id)
+      new_streaming_service_id = current_streaming_service_id.update_attribute(streaming_service_id: new_s_id)
+      # new_streaming_service_id.save
+      # updated_movie = new_movie.update(name: )
+      # updated_movie.save
+      puts "#{updated_movie.name.capitalize} has been updated with the correct streaming service."
       menu
       #.update
     elsif input == "Delete" || input == "4" || input == "delete"
       puts "Please enter the movie name to delete: "
       movie_name = gets.chomp
       new_movie = Movie.find_by(name: movie_name)
-      new_movie.destroy
-      puts "#{new_movie} has been deleted"
-      menu
-    #.destory
+      if new_movie
+        new_movie.destroy
+        puts "#{new_movie.name.capitalize} has been deleted."
+        menu
+      else
+        puts "#{movie_name.capitalize} doesn't exist, so it cannot be deleted! Please choose another option."
+        menu
+      end
     else
       puts "Hasta la vista, baby."
     end
 end
 
 def menu_streaming_services(new_movie)
-  choices = ["Netflix", "Hulu", "Amazon", "ITunes", "HBO", "Exit"]
+  choices = ["Netflix", "Hulu", "Amazon Prime", "ITunes", "HBO", "Exit"]
+  new_movie_id = Movie.all.where(name: new_movie)[0].id
 
   num = 1
   choices.each do |choice|
@@ -86,11 +114,15 @@ def menu_streaming_services(new_movie)
 
   input = gets.chomp
     if input == "Netflix" || input == "1" || input == "netflix"
-
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 1)
     elsif input == "Hulu" || input == "2" || input == "hulu"
-    elsif input == "Amazon" || input == "3" || input == "amazon"
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 2)
+    elsif input == "Amazon Prime" || input == "3" || input == "amazon prime"
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 3)
     elsif input == "ITunes" || input == "4" || input == "itunes"
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 4)
     elsif input == "HBO" || input == "5" || input == "hbo"
+      MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: 5)
     else
       puts "I'll be back."
   end
