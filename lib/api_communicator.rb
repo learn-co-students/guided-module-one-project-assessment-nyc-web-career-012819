@@ -46,9 +46,9 @@ def menu
     puts "#{num}. #{choice}"
     num += 1
   end
-    input = gets.chomp
+    input = gets.chomp.downcase
 
-    if input == "Check" || input == "1" || input == "check"
+    if input == "check" || input == "1"
       puts "Please enter the movie name: "
       movie_name = gets.chomp
 
@@ -68,12 +68,13 @@ def menu
       end
       menu
 
-    elsif input == "Add" || input == "2" || input == "add"
+    elsif input == "add" || input == "2"
       puts "Please enter the movie name to add: "
       movie_name = gets.chomp
       new_movie = Movie.find_by(name: movie_name)
       if new_movie
-        puts "#{new_movie.name.capitalize} already exists."
+        puts "#{new_movie.name.capitalize} already exists. You can add another streaming service if you'd like."
+        menu_streaming_services(new_movie)
         menu
       else
         newer_movie = Movie.create(name: movie_name)
@@ -83,7 +84,7 @@ def menu
         menu
       end
 
-    elsif input == "Update" || input == "3" || input == "update"
+    elsif input == "update" || input == "3"
       puts "Please enter the movie name to edit: "
       movie_name = gets.chomp
       new_movie_id = Movie.find_by(name: movie_name).id
@@ -100,7 +101,7 @@ def menu
       # puts "#{updated_movie.name.capitalize} has been updated with the correct streaming service."
       menu
       #.update
-    elsif input == "Delete" || input == "4" || input == "delete"
+    elsif input == "delete" || input == "4"
       puts "Please enter the movie name to delete: "
       movie_name = gets.chomp
       new_movie = Movie.find_by(name: movie_name)
@@ -113,13 +114,15 @@ def menu
         menu
       end
     else
+      #add input option
       puts "Hasta la vista, baby."
     end
 end
 
 def menu_streaming_services(new_movie)
   choices = ["Netflix", "Hulu", "Amazon Prime", "ITunes", "HBO", "Exit"]
-  new_movie_id = Movie.all.where(name: new_movie)[0].id
+  binding.pry
+  new_movie_id = Movie.all.where(name: new_movie.name)[0].id
 
   num = 1
   choices.each do |choice|
@@ -128,6 +131,7 @@ def menu_streaming_services(new_movie)
   end
 
   input = gets.chomp
+  #refactor input stuff
     if input == "Netflix" || input == "1" || input == "netflix"
       MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "Netflix").id)
     elsif input == "Hulu" || input == "2" || input == "hulu"
