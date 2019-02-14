@@ -56,8 +56,11 @@ def menu
 
       movie_from_db = Movie.find_by(name: movie_name)
       all_streaming_services = movie_from_db.streaming_services
-
-      puts "#{movie_name} is in ."
+      #movie_from_db.streaming_services
+      #<StreamingService:0x00007fc92f354508 id: 20, name: "Hulu", url: "https://www.hulu.com">]
+      #["name"] gives type error no implicit conversion of string into integer
+      #.name gives "StreamingService"
+      puts "#{movie_name} is in: "
       # binding.pry
       all_streaming_services.each do |streaming_service|
         puts "\nName: #{streaming_service.name}"
@@ -90,6 +93,7 @@ def menu
       new_s_id = StreamingService.find_by(name: new_streaming_service_name).id
       current_streaming_service_id = MovieStreamingService.where(movie_id: new_movie_id)
       new_streaming_service_id = current_streaming_service_id.update(streaming_service_id: new_s_id)
+      puts "#{movie_name} has been updated to display the correct streaming service."
       # new_streaming_service_id.save
       # updated_movie = new_movie.update(name: )
       # updated_movie.save
