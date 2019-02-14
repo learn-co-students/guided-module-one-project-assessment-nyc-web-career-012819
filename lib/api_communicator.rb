@@ -39,8 +39,19 @@ def menu
     if input == "Check" || input == "1" || input == "check"
       puts "Please enter the movie name: "
       movie_name = gets.chomp
+      # create empty movie info array
+      # check if the user input (name of movie/show) is in api.
+      # IF IT IS - add results to movie info array
+      # check if the user input is in own db.
+      # IF IT IS - add results to movie info array
+      # remove duplicate data from movie info array *** option ***
+      # iterate over unique movie info array and puts out each result
+      
+
       if Movie.find_by(name: movie_name)
+        # binding.pry
         movie_from_db = Movie.find_by(name: movie_name)
+        # binding.pry
         puts "Name: #{movie_from_db.name}"
 
         movie_streaming_service_from_db = MovieStreamingService.find_by(movie_id: movie_from_db.id)
@@ -50,6 +61,7 @@ def menu
         # puts "Name: #{movie_from_db.name}"
 
       else
+        # binding.pry
         get_movie_streaming_services_from_api(movie_name)
         menu
       end
