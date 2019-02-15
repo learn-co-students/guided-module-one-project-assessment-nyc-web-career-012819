@@ -3,7 +3,7 @@ require 'json'
 require 'pry'
 
 def get_movie_streaming_services_from_api(movie_name)
-  #make the web request
+
   response = Unirest.get "https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com/lookup?term=#{movie_name}",
   headers:{
     "X-RapidAPI-Key" => ENV['API_KEY']
@@ -11,14 +11,10 @@ def get_movie_streaming_services_from_api(movie_name)
 
 
   if response.body["results"].length == 0
-    # binding.pry
     if Movie.find_by(name: movie_name)
-      # movie_name_id = Movie.find_by(name: movie_name).id
-      # movie_streaming_service_id = MovieStreamingService.find_by(movie_id: movie_name_id).streaming_service_id
-      # StreamingService.find_by(id: movie_streaming_service_id)
-      # binding.pry
+
       puts "Name: #{movie_name}"
-      # puts "Streaming Service: "
+
     else
       puts "#{movie_name.capitalize} does not exist, please proceed to another option."
       menu
@@ -29,11 +25,6 @@ def get_movie_streaming_services_from_api(movie_name)
       associated_streaming_service = StreamingService.find_or_create_by(name: location["name"], url: location["url"])
       MovieStreamingService.find_or_create_by(movie_id: movie.id, streaming_service_id: associated_streaming_service.id)
     end
-
-      # puts "\nName: #{response.body["results"][0]["name"]}"
-      # puts "Streaming Service: #{response.body["results"][0]["locations"][i]["name"]}"
-      # puts "URL: #{response.body["results"][0]["locations"][i]["url"]}"
-    # menu
   end
 end
 
@@ -54,19 +45,20 @@ def menu
 
       get_movie_streaming_services_from_api(movie_name)
 
-      movie_from_db = Movie.find_by(name: movie_name)
-      all_streaming_services = movie_from_db.streaming_services
-      #movie_from_db.streaming_services
-      #<StreamingService:0x00007fc92f354508 id: 20, name: "Hulu", url: "https://www.hulu.com">]
-      #["name"] gives type error no implicit conversion of string into integer
-      #.name gives "StreamingService"
-      puts "#{movie_name} is in: "
-      # binding.pry
-      all_streaming_services.each do |streaming_service|
-        puts "\nName: #{streaming_service.name}"
-        puts "Url: #{streaming_service.url}"
+      if Movie.find_by(name: movie_name)
+        movie_from_db = Movie.find_by(name: movie_name)
+        all_streaming_services = movie_from_db.streaming_services
+
+        puts "#{movie_name} is in: "
+
+        all_streaming_services.each do |streaming_service|
+          puts "\nName: #{streaming_service.name}"
+          puts "Url: #{streaming_service.url}"
+        end
+        menu
       end
-      menu
+
+
 
     elsif input == "add" || input == "2"
       puts "Please enter the movie name to add: "
@@ -90,17 +82,14 @@ def menu
       new_movie_id = Movie.find_by(name: movie_name).id
       puts "Please enter the name of the streaming service you wish to change to: "
       new_streaming_service_name = gets.chomp
-      # binding.pry
+
       new_s_id = StreamingService.find_by(name: new_streaming_service_name).id
       current_streaming_service_id = MovieStreamingService.where(movie_id: new_movie_id)
       new_streaming_service_id = current_streaming_service_id.update(streaming_service_id: new_s_id)
       puts "#{movie_name} has been updated to display the correct streaming service."
-      # new_streaming_service_id.save
-      # updated_movie = new_movie.update(name: )
-      # updated_movie.save
-      # puts "#{updated_movie.name.capitalize} has been updated with the correct streaming service."
+
       menu
-      #.update
+
     elsif input == "delete" || input == "4"
       puts "Please enter the movie name to delete: "
       movie_name = gets.chomp
@@ -114,14 +103,12 @@ def menu
         menu
       end
     else
-      #add input option
       puts "Hasta la vista, baby."
     end
 end
 
 def menu_streaming_services(new_movie)
   choices = ["Netflix", "Hulu", "Amazon Prime", "ITunes", "HBO", "Exit"]
-  binding.pry
   new_movie_id = Movie.all.where(name: new_movie.name)[0].id
 
   num = 1
@@ -131,7 +118,7 @@ def menu_streaming_services(new_movie)
   end
 
   input = gets.chomp
-  #refactor input stuff
+
     if input == "Netflix" || input == "1" || input == "netflix"
       MovieStreamingService.create(movie_id: new_movie_id, streaming_service_id: StreamingService.find_by(name: "Netflix").id)
     elsif input == "Hulu" || input == "2" || input == "hulu"
