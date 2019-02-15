@@ -109,7 +109,11 @@ end
 
 def menu_streaming_services(new_movie)
   choices = ["Netflix", "Hulu", "Amazon Prime", "ITunes", "HBO", "Exit"]
-  new_movie_id = Movie.all.where(name: new_movie)[0].id
+  if Movie.find_by(name: new_movie)
+    new_movie_id = Movie.all.where(name: new_movie)[0].id
+  else
+    new_movie_id = Movie.all.where(name: new_movie.name)[0].id
+  end
 
   num = 1
   choices.each do |choice|
